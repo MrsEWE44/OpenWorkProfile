@@ -74,10 +74,14 @@ removeWorkProfileUsers(){
 }
 
 createWorkProfileUser(){
+	pm create-user --profileOf 0 --managed owp
+}
+
+createWorkProfileUsers(){
 	appnum=$1
 	for i in $(seq $appnum)
 	do
-		pm create-user --profileOf 0 --managed owp
+		createWorkProfileUser
 	done
 }
 
@@ -93,7 +97,7 @@ createWorkProfile(){
 			if [ "$createUserSize"  != "2" ];then
 				removeWorkProfileUsers
 			fi
-			createWorkProfileUser "$appnum"
+			createWorkProfileUsers "$appnum"
 			runTheWorkProfileUsers
 			fuckPkgByUsers "$pkgname"
 		else
@@ -137,6 +141,28 @@ reinstallByUser(){
 	fi
 }
 
+addOneWorkProfile(){
+	getPackage3
+	echo "q -- quit"
+	echo "please select package name : "
+	read  pkg_num
+	if [ "$pkg_num" == "q" ]
+	then
+		exit 0;
+	else
+		clear
+		pkgname=${pkgs[$pkg_num]}
+		echo "pkgname : $pkgname"
+		if [ "$pkgname" != "" ];then
+			createWorkProfileUser
+			runTheWorkProfileUsers
+			fuckPkgByUsers "$pkgname"
+		else
+			exit 1;
+		fi
+	fi
+}
+
 autoboot(){
 	echo "write auto boot file ...."
 	if [ -d "$pathdir" ];then
@@ -160,7 +186,7 @@ removeautobootfile(){
 }
 
 menu(){
-	echo -ne "1.create work profile\n2.remove work profile\n3.reinstall by user\n4.I want auto boot the work profile\n5.remove auto boot file\nq.exit\ninput : "
+	echo -ne "1.create work profile\n2.remove work profile\n3.reinstall by user\n4.I want auto boot the work profile\n5.remove auto boot file\n6.just add one work profile\nq.exit\ninput : "
 	read sssf
 	case $sssf in
 	1)
@@ -177,6 +203,9 @@ menu(){
 	exit 0;;
 	5)
 	removeautobootfile
+	exit 0;;
+	6)
+	addOneWorkProfile
 	exit 0;;
 	q)
 	exit 0;;
